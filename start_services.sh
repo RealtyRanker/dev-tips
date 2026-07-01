@@ -9,7 +9,7 @@ echo " RealtyRanker — rebuild & restart services"
 echo "========================================"
 echo ""
 
-SERVICES=(realty-parser flats-analyzer subscription-handler users-notifier)
+SERVICES=(realty-parser flats-analyzer subscription-handler users-notifier reports-builder)
 
 for i in "${!SERVICES[@]}"; do
   svc="${SERVICES[$i]}"
@@ -27,3 +27,4 @@ echo "  flats-analyzer:       http://localhost:9093"
 echo "  subscription-handler: http://localhost:9094"
 echo "  users-notifier API:   http://localhost:8080"
 echo "  users-notifier metrics: http://localhost:9091"
+echo "  reports-builder:      http://localhost:9096"

@@ -21,7 +21,7 @@
     }
   ],
   "cursorSync": "Off",
-  "description": "Product metrics for realty-parser, flats-analyzer, users-notifier, subscription-handler",
+  "description": "Product metrics for realty-parser, flats-analyzer, users-notifier, subscription-handler, reports-builder",
   "editable": true,
   "elements": {
     "panel-1": {
