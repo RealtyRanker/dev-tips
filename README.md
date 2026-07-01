@@ -51,6 +51,21 @@ cd subscription-handler && bash server_setup.sh
 cd users-notifier     && bash server_setup.sh
 ```
 
+### Пересборка и перезапуск только сервисов
+
+Если инфраструктура (Postgres, Kafka, Prometheus, Grafana) уже поднята и нужно
+просто пересобрать образы и перезапустить 4 сервиса (без клонирования репозиториев):
+
+```bash
+cd dev-tips
+chmod +x start_services.sh
+./start_services.sh
+```
+
+Скрипт ожидает, что директории `realty-parser`, `flats-analyzer`,
+`subscription-handler`, `users-notifier` уже существуют рядом с `dev-tips/`,
+и для каждой вызывает её `server_setup.sh` (docker build + пересоздание контейнера).
+
 ### Остановка всего
 
 ```bash
@@ -63,6 +78,7 @@ docker stop realty-postgres realty-kafka prometheus grafana \
 ```
 dev-tips/
   setup_all.sh          — запускает всё разом
+  start_services.sh     — пересобирает и перезапускает только 4 сервиса
   psql_setup.sh         — PostgreSQL в Docker
   kafka_setup.sh        — Kafka (KRaft) в Docker, создаёт топик realty.flats
   prometheus.sh         — Prometheus с конфигом prometheus_config.yaml
