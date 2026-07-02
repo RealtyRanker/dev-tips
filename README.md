@@ -75,6 +75,37 @@ docker stop realty-postgres realty-kafka prometheus grafana \
   realty-parser flats-analyzer subscription-handler users-notifier reports-builder
 ```
 
+### Токен Telegram-бота
+
+Токен бота не хранится в `config.yaml` — сервисы `subscription-handler` и `users-notifier` читают его из файла на диске. Путь к файлу задаётся в конфиге:
+
+```yaml
+# subscription-handler/config.yaml
+telegram:
+  bot_token_file: "/etc/subscription-handler/bot_token"
+
+# users-notifier/config.yaml
+telegram:
+  bot_token_file: "/etc/users-notifier/bot_token"
+```
+
+При старте каждый сервис логирует путь к файлу:
+
+```
+{"level":"info","msg":"loading bot token","file":"/etc/subscription-handler/bot_token"}
+```
+
+Перед первым запуском создайте файлы с токеном:
+
+```bash
+sudo mkdir -p /etc/subscription-handler /etc/users-notifier
+sudo sh -c 'echo -n "<BOT_TOKEN>" > /etc/subscription-handler/bot_token'
+sudo sh -c 'echo -n "<BOT_TOKEN>" > /etc/users-notifier/bot_token'
+sudo chmod 640 /etc/subscription-handler/bot_token /etc/users-notifier/bot_token
+```
+
+Замените `<BOT_TOKEN>` на токен от [@BotFather](https://t.me/BotFather).
+
 ### Структура файлов
 
 ```
