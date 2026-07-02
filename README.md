@@ -75,6 +75,56 @@ docker stop realty-postgres realty-kafka prometheus grafana \
   realty-parser flats-analyzer subscription-handler users-notifier reports-builder
 ```
 
+### Применение миграций
+
+`psql_setup.sh` применяет миграции автоматически после старта контейнера
+(вызывает `apply_migrations.sh`), так что при обычном `./setup_all.sh` или
+`./psql_setup.sh` ничего дополнительно делать не нужно.
+
+Чтобы применить миграции вручную (например, если БД уже была поднята раньше):
+
+```bash
+cd dev-tips
+chmod +x apply_migrations.sh
+./apply_migrations.sh
+```
+
+Скрипт ожидает, что контейнер `realty-postgres` уже запущен. Он по очереди
+применяет все `*.sql` файлы из `dev-tips/migrations/` в алфавитном порядке
+(имена файлов начинаются с номера, например `001_create_flats_history.sql`).
+Уже применённые миграции отслеживаются в таблице `schema_migrations` внутри
+БД и повторно не выполняются.
+
+### Синхронизация репозиториев
+
+Скрипты `fetch_all.sh` и `push_all.sh` работают со всеми репозиториями сразу:
+`dev-tips`, `realty-parser`, `flats-analyzer`, `subscription-handler`,
+`users-notifier`, `reports-builder`.
+
+#### fetch_all.sh — подтянуть изменения
+
+```bash
+cd dev-tips
+chmod +x fetch_all.sh
+./fetch_all.sh
+```
+
+Для каждого репозитория выполняет `git fetch --all` и `git pull origin main`.
+
+#### push_all.sh — закоммитить и запушить изменения
+
+```bash
+cd dev-tips
+chmod +x push_all.sh
+./push_all.sh "commit message"
+```
+
+Коммит-сообщение передаётся первым аргументом и используется для всех
+репозиториев. Скрипт обрабатывает только те репозитории, где есть
+незакоммиченные изменения (`git status --porcelain` непустой): для них
+выполняет `git add .`, `git commit -m "<message>"` и `git push origin main`.
+Репозитории без изменений пропускаются.
+
 ### Токен Telegram-бота
 
 Токен бота не хранится в `config.yaml` — сервисы `subscription-handler` и `users-notifier` читают его из файла на диске. Путь к файлу задаётся в конфиге:
@@ -112,6 +162,10 @@ sudo chmod 640 /etc/subscription-handler/bot_token /etc/users-notifier/bot_token
 dev-tips/
   setup_all.sh          — запускает всё разом
   start_services.sh     — пересобирает и перезапускает только сервисы
+  fetch_all.sh          — git fetch --all + git pull origin main во всех репозиториях
+  push_all.sh           — git add + commit + push origin main во всех изменённых репозиториях
+  apply_migrations.sh   — применяет SQL-миграции из migrations/ к БД
+  migrations/            — SQL-миграции для realty-postgres
   psql_setup.sh         — PostgreSQL в Docker
   kafka_setup.sh        — Kafka (KRaft) в Docker, создаёт топик realty.flats
   prometheus.sh         — Prometheus с конфигом prometheus_config.yaml

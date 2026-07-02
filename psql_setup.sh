@@ -38,6 +38,9 @@ until docker exec "$PG_CONTAINER" pg_isready -U "$PG_USER" -q; do
 done
 echo "    Postgres is ready."
 
+echo "==> Applying migrations"
+bash "$SCRIPT_DIR/apply_migrations.sh"
+
 echo ""
 echo "Useful commands:"
 echo "  Postgres CLI: docker exec -it $PG_CONTAINER psql -U $PG_USER -d $PG_DB"
